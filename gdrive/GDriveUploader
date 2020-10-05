@@ -143,7 +143,7 @@ create_dir(){
     check_token
     while [ 1 ] ;  do
 	wait_until_proper_hours
-	curl --insecure -s --max-time 100 -H "Host: www.googleapis.com" -H "Authorization: Bearer ${access_token}" -H "Content-Type: application/json" --data "{'title': '${1}', 'parents': [{'id': '${folder_id}'}], 'mimeType': 'application/vnd.google-apps.folder'}" --request POST -o ${gdrive_dir}tmp/lastDirInfo 'https://www.googleapis.com/drive/v2/files?fields=id' > /dev/null
+	curl --insecure -s --max-time 100 -H "Host: www.googleapis.com" -H "Authorization: Bearer ${access_token}" -H "Content-Type: application/json" --data "{'title': '${1}', 'parents': [{'id': '${folder_id}'}], 'mimeType': 'application/vnd.google-apps.folder'}" --request POST -o ${gdrive_dir}tmp/lastDirInfo 'https://www.googleapis.com/drive/v2/files?supportsAllDrives=true&fields=id' > /dev/null
 	if [ -f "${gdrive_dir}tmp/lastDirInfo" ]; then
 	    google_dir_id=$(cat "${gdrive_dir}tmp/lastDirInfo" | ${gdrive_dir}./JSON.sh -b | grep -E '\["id"\]' | sed 's/\[.*\][^\"]*//g' | sed 's/\"//g')
 	    if [ "${google_dir_id}" = "" ]; then
@@ -267,7 +267,7 @@ sendFile(){
     tries=0
     while [ 1 ] ;  do
             wait_until_proper_hours
-	curl --insecure -s --max-time 1200 -H "Host: www.googleapis.com" -H "Authorization: Bearer ${access_token}" -H "Content-Length: $(ls -ls ${record_dir}${current_dir}/${1}| awk '{print $6}')" -H "Content-Type: video/mp4" --request PUT -T ${record_dir}${current_dir}/${1} -o ${gdrive_dir}tmp/lastFileInfo "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&upload_id=${2}"
+	curl --insecure -s --max-time 1200 -H "Host: www.googleapis.com" -H "Authorization: Bearer ${access_token}" -H "Content-Length: $(ls -ls ${record_dir}${current_dir}/${1}| awk '{print $6}')" -H "Content-Type: video/mp4" --request PUT -T ${record_dir}${current_dir}/${1} -o ${gdrive_dir}tmp/lastFileInfo "https://www.googleapis.com/upload/drive/v3/files?supportsAllDrives=true&uploadType=resumable&upload_id=${2}"
 	if [ -f "${gdrive_dir}tmp/lastFileInfo" ]; then
 	    file_id=$(cat "${gdrive_dir}tmp/lastFileInfo" | ${gdrive_dir}./JSON.sh -b | grep -E '\["id"\]' | sed 's/\[.*\][^\"]*//g' | sed 's/\"//g')
 	    if [ "${file_id}" = "" ]; then
@@ -312,7 +312,7 @@ sendMatadata(){
     jsonData="{'name': '${1}', parents: ['${google_dir_id}']}"
     while [ 1 ] ;  do
             wait_until_proper_hours
-	curl --insecure -s --max-time 100 -H "Host: www.googleapis.com" -H "Authorization: Bearer ${access_token}" -H "Content-Length: $(echo "${jsonData}" | awk '{print length}')" -H "Content-Type: application/json; charset=UTF-8" -H "X-Upload-Content-Type: video/mp4" -H "X-Upload-Content-Length: $(ls -ls ${record_dir}${current_dir}/${1}| awk '{print $6}')" --request POST  --data "${jsonData}" -D ${gdrive_dir}tmp/lastFileMetadataInfo "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable" > /dev/null
+	curl --insecure -s --max-time 100 -H "Host: www.googleapis.com" -H "Authorization: Bearer ${access_token}" -H "Content-Length: $(echo "${jsonData}" | awk '{print length}')" -H "Content-Type: application/json; charset=UTF-8" -H "X-Upload-Content-Type: video/mp4" -H "X-Upload-Content-Length: $(ls -ls ${record_dir}${current_dir}/${1}| awk '{print $6}')" --request POST  --data "${jsonData}" -D ${gdrive_dir}tmp/lastFileMetadataInfo "https://www.googleapis.com/upload/drive/v3/files?supportsAllDrives=true&uploadType=resumable" > /dev/null
 	if [ -f "${gdrive_dir}tmp/lastFileMetadataInfo" ]; then
 	    if grep -q "200 OK" ${gdrive_dir}tmp/lastFileMetadataInfo && ( grep -q "Location" ${gdrive_dir}tmp/lastFileMetadataInfo || grep -q "X-GUploader-UploadID" ${gdrive_dir}tmp/lastFileMetadataInfo; ); then
 	        upload_file_id=$(cat ${gdrive_dir}tmp/lastFileMetadataInfo | grep -E 'X-GUploader-UploadID:' | sed 's/.*\ //g' | tr -d '\n' | tr -d '\r')
