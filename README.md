@@ -4,13 +4,13 @@ https://github.com/porunov/xiaomi_gdrive
 
 I ported it on yi cam based on MStar platform.
 
-Google drive loader for yi smart ip camera (MStar based). yi_gdrive let you automatically upload your videos from xiaomi smart ip camera to your google drive account. Also it can automatically remove old files from your google drive account to prevent space exhaustion.
+Google drive loader for yi smart ip camera (MStar based). yi_gdrive let you automatically upload your videos from yi smart ip camera to your Google Drive account. Also it can automatically remove old files from your Google Drive account to prevent space exhaustion.
 If you want to run this tool, you need to hack the cam:
 https://github.com/roleoroleo/yi-hack-MStar
 
 ![ants_smart_webcam_ xiaomi](https://cloud.githubusercontent.com/assets/17673243/17768152/76d2a56a-653b-11e6-81db-522a29f9f1f2.png)
 
-### Step-by-step instruction for installing xiaomi_gdrive
+### Step-by-step instruction for installing yi_gdrive
 
 1. Turn off your camera and get microSD
 2. Download yi_gdrive
@@ -49,7 +49,7 @@ https://github.com/roleoroleo/yi-hack-MStar
 10. Create your Google Drive application and OAuth keys for Google Drive API (example tutorial: http://www.iperiusbackup.net/en/how-to-enable-google-drive-api-and-get-client-credentials/)
    
    Example:
-   - Go to Google Api Console (https://console.developers.google.com/?hl=RU)
+   - Go to Google Api Console (https://console.developers.google.com/)
    - Click "Drive API"
    - Clieck "Create project" and create it (if don't have one)
    - Click "Enable"
