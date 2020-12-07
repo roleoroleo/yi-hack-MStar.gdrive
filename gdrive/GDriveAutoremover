@@ -19,6 +19,15 @@ start_time="00:00:00"
 # hours: 23 minutes: 59 seconds: 59
 finish_time="23:59:59"
 
+#min_free_space - 600 MB * 1048576 = 629145600 byte
+min_free_space=629145600
+#prefer_free_space - 1200 MB * 1048576 = 1258291200 byte
+prefer_free_space=1258291200
+# hours: 00 minutes: 00 seconds: 00
+start_time="00:00:00"
+# hours: 23 minutes: 59 seconds: 59
+finish_time="23:59:59"
+
 wait_until_proper_hours(){
   while [ 1 ] ;  do
     current_time=`date +"%H:%M:%S" | awk -F':' '{print $1 * 60 * 60 + $2 * 60 + $3}'`
@@ -35,18 +44,20 @@ wait_until_proper_hours(){
   done
 }
 
-check_log_file(){
-	if [ $(stat -c %s ${log}) -gt 524288 ]; then
-		tail -100 ${log} > ${log}.new
-		mv ${log}.new ${log}
-		rm ${log}.new
-	fi
+
+check_log_file() {
+  if [ $(ls -ls ${log}| awk '{print $6}') -gt 524288 ]; then
+    tail -100 ${log} > ${log}.new
+    rm ${log}
+    mv ${log}.new ${log}
+  fi
 }
+
 
 renew_token(){
 	while [ 1 ] ;  do
 		wait_until_proper_hours
-		${gdrive_bin_dir}./curl --insecure -s --max-time 100 -H "Host: www.googleapis.com" -H "Content-Type: application/x-www-form-urlencoded" --request POST -o ${gdrive_dir}conf/refreshed_token --data "client_id=${client_id}&client_secret=${client_secret}&refresh_token=${refresh_token}&grant_type=refresh_token" 'https://www.googleapis.com/oauth2/v4/token' > /dev/null
+		curl --insecure -s --max-time 100 -H "Host: www.googleapis.com" -H "Content-Type: application/x-www-form-urlencoded" --request POST -o ${gdrive_dir}conf/refreshed_token --data "client_id=${client_id}&client_secret=${client_secret}&refresh_token=${refresh_token}&grant_type=refresh_token" 'https://www.googleapis.com/oauth2/v4/token' > /dev/null
 		if [ -f "${gdrive_dir}conf/refreshed_token" ]; then
 			if grep -q "access_token" ${gdrive_dir}conf/refreshed_token; then
 				break
@@ -147,8 +158,8 @@ read_conf_files(){
 get_space_info(){
 	check_token
 	while [ 1 ] ;  do
-	        wait_until_proper_hours
-		${gdrive_bin_dir}./curl --insecure -s --max-time 100 -H "Host: www.googleapis.com" -H "Authorization: Bearer ${access_token}" --request GET  -o ${gdrive_dir}tmp/spaceInfo "https://www.googleapis.com/drive/v2/about?fields=quotaBytesTotal,quotaBytesUsedAggregate" > /dev/null
+	  wait_until_proper_hours
+		curl --insecure -s --max-time 100 -H "Host: www.googleapis.com" -H "Authorization: Bearer ${access_token}" --request GET  -o ${gdrive_dir}tmp/spaceInfo "https://www.googleapis.com/drive/v2/about?fields=quotaBytesTotal,quotaBytesUsedAggregate" > /dev/null
 		if [ -f "${gdrive_dir}tmp/spaceInfo" ]; then
 			total_space=$(cat "${gdrive_dir}tmp/spaceInfo" | ${gdrive_dir}./JSON.sh -b | grep -E '\["quotaBytesTotal"\]' | sed 's/\[.*\][^\"0-9tf]*//g' | sed 's/\"//g')
 			used_space=$(cat "${gdrive_dir}tmp/spaceInfo" | ${gdrive_dir}./JSON.sh -b | grep -E '\["quotaBytesUsedAggregate"\]' | sed 's/\[.*\][^\"0-9tf]*//g' | sed 's/\"//g')
@@ -176,8 +187,8 @@ get_space_info(){
 get_folder_list(){
 	check_token
 	while [ 1 ] ;  do
-	        wait_until_proper_hours
-		${gdrive_bin_dir}./curl --insecure -s --max-time 100 -H "Host: www.googleapis.com" -H "Authorization: Bearer ${access_token}" --request GET  -o ${gdrive_dir}tmp/folderListToRemove "https://www.googleapis.com/drive/v2/files?q='${folder_id}'%20in%20parents%20and%20mimeType='application/vnd.google-apps.folder'%20and%20trashed=false&orderBy=createdDate&maxResults=${1}&fields=items(id,title)" > /dev/null
+	  wait_until_proper_hours
+		curl --insecure -s --max-time 100 -H "Host: www.googleapis.com" -H "Authorization: Bearer ${access_token}" --request GET  -o ${gdrive_dir}tmp/folderListToRemove "https://www.googleapis.com/drive/v2/files?q='${folder_id}'%20in%20parents%20and%20mimeType='application/vnd.google-apps.folder'%20and%20trashed=false&orderBy=createdDate&maxResults=${1}&fields=items(id,title)" > /dev/null
 		if [ -f "${gdrive_dir}tmp/folderListToRemove" ]; then
 			if ! grep -q "items" ${gdrive_dir}tmp/folderListToRemove; then
 				response_code=$(cat "${gdrive_dir}tmp/folderListToRemove" | ${gdrive_dir}./JSON.sh -b | grep -E '\["error","code"\]' | sed 's/\[.*\][^\"0-9tf]*//g' | sed 's/\"//g')
@@ -205,8 +216,8 @@ get_folder_list(){
 remove_folder(){
 	check_token
 	while [ 1 ] ;  do
-	        wait_until_proper_hours
-		${gdrive_bin_dir}./curl --insecure -s --max-time 100 -H "Host: www.googleapis.com" -H "Authorization: Bearer ${access_token}" --request DELETE  -o ${gdrive_dir}tmp/removedFolder "https://www.googleapis.com/drive/v2/files/${1}" > /dev/null
+	  wait_until_proper_hours
+		curl --insecure -s --max-time 100 -H "Host: www.googleapis.com" -H "Authorization: Bearer ${access_token}" --request DELETE  -o ${gdrive_dir}tmp/removedFolder "https://www.googleapis.com/drive/v2/files/${1}" > /dev/null
 		if [ -f "${gdrive_dir}tmp/removedFolder" ]; then
 			response_code=$(cat "${gdrive_dir}tmp/removedFolder" | ${gdrive_dir}./JSON.sh -b | grep -E '\["error","code"\]' | sed 's/\[.*\][^\"0-9tf]*//g' | sed 's/\"//g')
 			if [ "${response_code}" = "401" ]; then
@@ -228,7 +239,11 @@ start_autoremover(){
 	while [ 1 ] ;  do
 		get_space_info
 		let_space=$((${total_space} - ${min_free_space}))
-		if [ ${used_space} -gt ${let_space} ]; then
+
+		# This will report 'out of range' error and exit on camera
+		# if [ ${used_space} -gt ${let_space} ]; then
+		# Change it to: Divided by 1024 before do the comparision
+		if [ $((used_space/1024)) -gt $((let_space/1024)) ]; then
 			let_space=$((${total_space} - ${prefer_free_space}))
 			while [ ${used_space} -gt ${let_space} ]; do
 				folders_count=$(echo ${used_space} ${let_space} | awk '{ printf "%.0f", ($1 - $2) / 251658240 + 1}')
@@ -255,6 +270,6 @@ start_autoremover(){
 start_time=`echo ${start_time} | awk -F':' '{print $1 * 60 * 60 + $2 * 60 + $3}'`
 finish_time=`echo ${finish_time} | awk -F':' '{print $1 * 60 * 60 + $2 * 60 + $3}'`
 
-read_conf_files >> ${log}
+read_conf_files >> ${log} 
 start_autoremover >> ${log} 2>&1 &
 exit 0
