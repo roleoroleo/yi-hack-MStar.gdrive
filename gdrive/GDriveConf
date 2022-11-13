@@ -57,13 +57,13 @@ configure(){
 	read client_secret
 	echo ""
 	echo 'Put this link into your browser:'
-	echo 'https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/drive&state=state&redirect_uri=urn:ietf:wg:oauth:2.0:oob&response_type=code&client_id='$client_id'&access_type=offline'
+	echo 'https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/drive&state=state&redirect_uri=http://127.0.0.1&response_type=code&client_id='$client_id'&access_type=offline'
 	echo ""
 	echo 'Copy and paste your code here: '
 
 	while [ 1 ] ;  do
 		read code
-		${gdrive_bin_dir}./curl --insecure -H "Host: www.googleapis.com" -H "Content-Type: application/x-www-form-urlencoded" -d "code=${code}&client_id=${client_id}&client_secret=${client_secret}&redirect_uri=urn:ietf:wg:oauth:2.0:oob&grant_type=authorization_code" -o ${gdrive_dir}conf/response https://www.googleapis.com/oauth2/v4/token
+		${gdrive_bin_dir}./curl --insecure -H "Host: www.googleapis.com" -H "Content-Type: application/x-www-form-urlencoded" -d "code=${code}&client_id=${client_id}&client_secret=${client_secret}&redirect_uri=http://127.0.0.1&grant_type=authorization_code" -o ${gdrive_dir}conf/response https://www.googleapis.com/oauth2/v4/token
 		if grep -q "access_token" ${gdrive_dir}conf/response & grep -q "refresh_token" ${gdrive_dir}conf/response; then
 			break
 		else
