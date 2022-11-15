@@ -44,37 +44,36 @@ https://github.com/roleoroleo/yi-hack-MStar
   
 6. Put microSD into your camera
 7. Turn on camera
-8. After turnung on a camera use telnet or ssh to connect to your camera:
-9. Go to the browser
-10. Create your Google Drive application and OAuth keys for Google Drive API (example tutorial: http://www.iperiusbackup.net/en/how-to-enable-google-drive-api-and-get-client-credentials/)
-   
-   Example:
-   - Go to Google Api Console (https://console.developers.google.com/)
-   - Click "Drive API"
-   - Clieck "Create project" and create it (if don't have one)
-   - Click "Enable"
-   - Go to Credentials and add credentials to your project
-      1. Where will you be calling the API from? : Other UI (e.g. Windows, CLI tool)
-      2. What data will you be accessing? : User data
-      3. Click "What credentials do I need?"
-      4. Name your credentials as you want
-      5. Product name shown to users - use any name
-      6. Click "Done"
-   - Click on your credentials
-   - Save your client id and client secret
+8. After turning on your camera, use telnet or SSH (the default user is `root` without passowrd) to connect to your camera:
+9. Go to the browser, create your Google Drive application and OAuth keys for Google Drive API (example tutorial: http://www.iperiusbackup.net/en/how-to-enable-google-drive-api-and-get-client-credentials/). Essential steps' summary:
+    1.  Create a project by click **NEW PROJECT** button or select your existing project to work on;
+    3.  Enter [https://console.cloud.google.com/apis/](https://console.cloud.google.com/apis/) page;
+    4.  Click the **+ ENABLE APIS AND SERVICES** button on top or the **Library** tab in the left side bar. Then search `Google Drive API`, select and enable it;
+    5.  Configure **OAuth consent screen**: Choose `External` User Type, fill App name, user support email, Developer contact email, and then:
+        1.  SAVE AND CONTINUE
+        2.  BACK TO DASHBOARD
+        3.  PUBLISH APP
+    6.  Click **Credentials** tab in left side bar:
+        1.  Click **+ CREATE CREDENTIALS** button, choose the second item **OAuth client ID**;
+        2.  Choose `Web application` as the Application type, input the app name;
+        3.  Add `http://127.0.0.1` as one of your Authorized redirect URIs when you create the credentials.
+        4.  Fetch ans save your client ID and client secret (or download the JSON file).
 
-11. Go to your console back
-12. Run GDriveConf from /tmp/sd/yi-hack/gdrive folder to configure your Google Drive access:
+10. Go back to your SSH console
+11. Run GDriveConf from /tmp/sd/yi-hack/gdrive folder to configure your Google Drive access:
 
   ```
-  sh /tmp/sd/yi-hack/gdrive/GDriveConf
+  cd /tmp/sd/
+  sh yi-hack/gdrive/GDriveConf
   ```
 
 13. Paste your client id and press enter
 14. Paste your client secret and press enter
 15. Copy link which you see and paste into your browser
 16. Click "Accept"
-17. Copy code which you see
+17. Select and copy the code **from the browser address bar**. :warning: Even when you see a page shows "This site can't be reached", you've already got the code in your address bar. e.g.:
+    1.  `127.0.1/?state=state&code=4%F0AfgeXvsbZbJJklkweJKJklsfl899DcstdjfkIfdMQxffdf&scope=https:%3A%2F%2Fwww.googleapis.com%2Fauth%2fdrive` 
+    2.  copy the string between `&code=` and `&scope=` which is your authorization code
 18. Go to your console back
 19. Paste your code and press enter
 20. You will be suggested to see the folders. Press Enter if you want to see all folders. If you want to see only root folders type `root` and press Enter.
@@ -85,12 +84,15 @@ https://github.com/roleoroleo/yi-hack-MStar
 24. Reboot your camera:
 
   ```
-  reboot
+  reboot  # do it manually if this command doesn't work
   ```
-
 25. Done
+
+You can check some [screenshots](https://github.com/roleoroleo/yi-hack-MStar.gdrive/tree/master/screenshots) for reference guide.
 
 How it works:
 The script in the loop will create the same folders as in the record folder and upload videos into Google Drive. After the reboot, or failure of the internet script continues normally send files. If you have enabled automatic remove, GDriveAutoremover will check your free space every 45 minutes. In case when disk space is not enough, the script will erase old videos (IMPORTANT: do not put anything extra in the folder which is designed for video because GDriveAutoremover can remove it if it considers that the disk space is not enough).
 
-This scripts were tested under model y203c with firmware 4.5.0 and yi-hack-MStar 0.3.5
+This scripts were tested under:
+- model y203c with firmware 4.5.0 and yi-hack-MStar 0.3.5
+- model y201c(Yi 1080p Dome BFUS) with firmware 4.6.0.0A_201908271549 and yi-hack-MStar 0.4.7 by @denven
