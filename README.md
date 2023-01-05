@@ -4,9 +4,12 @@ https://github.com/porunov/xiaomi_gdrive
 
 I ported it on yi cam based on MStar platform.
 
-Google drive loader for yi smart ip camera (MStar based). yi_gdrive let you automatically upload your videos from yi smart ip camera to your Google Drive account. Also it can automatically remove old files from your Google Drive account to prevent space exhaustion.
+**Google drive loader** for yi smart ip camera (MStar based). yi_gdrive let you automatically upload your videos from yi smart ip camera to your Google Drive account. Also it can automatically remove old files from your Google Drive account to prevent space exhaustion.
 If you want to run this tool, you need to hack the cam:
 https://github.com/roleoroleo/yi-hack-MStar
+
+For Microsoft **OneDrive** storage users, please check [yihack-onedrive-uploader](https://github.com/denven/yihack-onedrive-uploader)
+
 
 ![ants_smart_webcam_ xiaomi](https://cloud.githubusercontent.com/assets/17673243/17768152/76d2a56a-653b-11e6-81db-522a29f9f1f2.png)
 
